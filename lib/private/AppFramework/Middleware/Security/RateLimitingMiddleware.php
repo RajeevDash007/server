@@ -83,7 +83,7 @@ class RateLimitingMiddleware extends Middleware {
 		parent::beforeController($controller, $methodName);
 		$rateLimitIdentifier = get_class($controller) . '::' . $methodName;
 
-		if ($this->session->exists('app_api')) {
+		if ($this->session->exists('app_api_system')) {
 			// Bypass rate limiting for app_api
 			return;
 		}
