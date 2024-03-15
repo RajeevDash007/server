@@ -150,7 +150,7 @@ export const handleCopyMoveNodeTo = async (node: Node, destination: Folder, meth
 						}
 					} catch (error) {
 						// User cancelled
-						showError(t('files','Move cancelled'))
+						showError(t('files', 'Move cancelled'))
 						return
 					}
 				}
