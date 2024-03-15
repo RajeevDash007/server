@@ -220,6 +220,18 @@ class AppConfigTest extends TestCase {
 		return $config;
 	}
 
+
+	/**
+	 * confirm that no lazy config are loaded during the normal boot of Nextcloud
+	 */
+	public function testLazyConfigNotLoaded(): void {
+		$config = \OCP\Server::get(IAppConfig::class);
+
+		$status = $config->statusCache();
+		$this->assertEquals(false, $status['lazyLoaded'], 'It seems lazy config values are loaded during the boot of Nextcloud ?');
+	}
+
+
 	public function testGetApps(): void {
 		$config = $this->generateAppConfig(false);
 

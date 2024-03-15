@@ -272,7 +272,7 @@ class AppConfig implements IAppConfig {
 
 		foreach (array_keys($cache) as $app) {
 			if (isset($cache[$app][$key])) {
-				$appCache = $this->formatAppValues((string)$app, $cache[$app]);
+				$appCache = $this->formatAppValues((string)$app, $cache[$app], $lazy);
 				$values[$app] = $appCache[$key];
 			}
 		}
@@ -512,9 +512,9 @@ class AppConfig implements IAppConfig {
 	 * @see VALUE_BOOL
 	 * @see VALUE_ARRAY
 	 */
-	public function getValueType(string $app, string $key): int {
+	public function getValueType(string $app, string $key, ?bool $lazy = null): int {
 		$this->assertParams($app, $key);
-		$this->loadConfigAll();
+		$this->loadConfig($lazy);
 
 		if (!isset($this->valueTypes[$app][$key])) {
 			throw new AppConfigUnknownKeyException('unknown config key');
@@ -1390,14 +1390,24 @@ class AppConfig implements IAppConfig {
 
 
 	/**
+	 * **Warning:** avoid default NULL value for $lazy as this will
+	 * load all lazy values from the database
+	 *
 	 * @param string $app
 	 * @param array $values
+	 * @param bool|null $lazy
 	 *
 	 * @return array
 	 */
-	private function formatAppValues(string $app, array $values): array {
+	private function formatAppValues(string $app, array $values, ?bool $lazy = null): array {
 		foreach($values as $key => $value) {
-			switch ($this->getValueType($app, $key)) {
+			try {
+				$type = $this->getValueType($app, $key, $lazy);
+			} catch (AppConfigUnknownKeyException $e) {
+				continue;
+			}
+
+			switch ($type) {
 				case self::VALUE_INT:
 					$values[$key] = (int)$value;
 					break;
