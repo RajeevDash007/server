@@ -336,9 +336,15 @@ class LoginController extends Controller {
 			);
 		}
 
+		$user = trim($user);
+
+		if (strlen($user) > 255) {
+			return new JSONResponse($this->error($this->l10n->t('Unsupported email length (>255)')));
+		}
+
 		$data = new LoginData(
 			$this->request,
-			trim($user),
+			$user,
 			$password,
 			$redirect_url,
 			$timezone,
